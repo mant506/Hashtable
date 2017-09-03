@@ -4,9 +4,10 @@
 
 #include "mylib.h"
 #include "htable.h"
+#include "container.h"
 
 struct htablerec {
-    char **keys;
+    container *containers;
     int *frequencies;
     int num_keys;
     unsigned int capacity;
@@ -24,16 +25,20 @@ static unsigned int htable_word_to_int(char *word) {
     return result;
 }
 
-htable htable_new(int capacity) {
+htable htable_new(int capacity, char *container_type) {
     int i;
     htable result = emalloc(sizeof *(result));
     result->capacity = capacity;
     result->num_keys = 0;
-    result->frequencies = emalloc(capacity*(sizeof result->frequencies[0]));
-    result->keys = emalloc(capacity*(sizeof result->keys[0]));
+    result->frequencies = emalloc(capacity * sizeof result->frequencies[0]);
+    result->containers = emalloc(capacity * sizeof(struct containerrec *));
     for (i = 0; i < capacity; i++) {
-        result->keys[i] = NULL;
         result->frequencies[i] = 0;
+        if (strcmp(container_type, "-r") == 0) {
+            result->containers[i] = container_new_rbt();
+        } else {
+            result->containers[i] = container_new_flexarray();
+        }
     }
     return result;                       
 }
@@ -42,9 +47,9 @@ void htable_free(htable h) {
     unsigned int i;
     free(h->frequencies);
     for (i = 0; i < h->capacity; i++) {
-        free(h->keys[i]);
+        container_free(h->containers[i]);
     }
-    free(h->keys);
+    free(h->containers);
     free(h);
 }
 
@@ -53,23 +58,25 @@ int htable_insert(htable h, char *str) {
     unsigned int index = htable_word_to_int(str) % h->capacity;
     int step = htable_step(h, index);
     unsigned int i = index;
-    if (h->keys[index] == NULL) {
-        h->keys[index] = emalloc((strlen(str)+1)*sizeof(h->keys[index][0]));
-        strcpy(h->keys[index],str);
+    if (h->containers[index] == NULL) {
+        container_add(h->containers[index], str); 
         h->frequencies[index] = 1;
+        h->num_keys++;
         return 1;
-    } else if (strcmp(h->keys[index],str) == 0) {
+    } else if (container_search(h->containers[index], str) == 1) {
+        container_add(h->containers[index], str);
         h->frequencies[index]++;
         return h->frequencies[index];
     } else {
         do {
             index = (index + step) % h->capacity;
-        } while (h->keys[index] != NULL && strcmp(h->keys[index], str) != 0  && index != i);
-        if (h->keys[index] == NULL) {
-            h->keys[index] = emalloc((strlen(str)+1)*sizeof(h->keys[index][0]));
-            strcpy(h->keys[index],str);
+        } while (h->containers[index] != NULL && container_search(h->containers[index], str) != 1  && index != i);
+        if (h->containers[index] == NULL) {
+            container_add(h->containers[index], str); 
             h->frequencies[index] = 1;
-        } else if (strcmp(h->keys[index],str) == 0) {
+            h->num_keys++;
+        } else if (container_search(h->containers[index], str)) {
+            container_add(h->containers[index], str); 
             h->frequencies[index]++;
             return h->frequencies[index];
         } else {
@@ -82,8 +89,10 @@ int htable_insert(htable h, char *str) {
 void htable_print(htable h, FILE *stream) {
     unsigned int i;
     for (i = 0; i < h->capacity; i++) {
-        if (h->frequencies[i] != 0)
-            fprintf(stream, "%d %s\n", h->frequencies[i], h->keys[i]);
+        if (h->frequencies[i] != 0) {
+            fprintf(stream, "%d ", h->frequencies[i]);
+            container_print(h->containers[i], print_word);
+        }
     }
 }
 
@@ -92,7 +101,7 @@ int htable_search(htable h, char *str) {
     unsigned int index = htable_word_to_int(str) % h->capacity;
     int step = htable_step(h, index);
     unsigned int i = index;
-    while (h->keys[index] != NULL && strcmp(h->keys[index],str) != 0 && index != i) {
+    while (h->containers[index] != NULL && container_search(h->containers[index], str) != 1  && index != i) {
         index = (index + step) % h->capacity;
         collisions++;
     }
