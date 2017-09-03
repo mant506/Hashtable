@@ -10,7 +10,7 @@ extern rbt   rbt_free(rbt b);
 extern void  rbt_inorder(rbt b, void f(char *str));
 extern rbt   rbt_insert(rbt b, char *str);
 extern rbt   rbt_new();
-extern void  rbt_preorder(rbt b, void f(char *str1, char *str2, int count));
+extern void  rbt_preorder(rbt b, void f(char *str1));
 extern int   rbt_search(rbt b, char *str);
 
 #endif

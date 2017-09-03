@@ -143,14 +143,14 @@ void rbt_inorder(rbt b, void f(char *str)) {
     rbt_inorder(b->right,f);
 }
 
-void rbt_preorder(rbt b, void f(char *str1, char *str2, int count)) {
+void rbt_preorder(rbt b, void f(char *str1)) {
     if (NULL == b) {
         return;
     }
     if (IS_RED(b)) {
-        f(b->key, "red", b->count);
+        f(b->key);
     } else if (IS_BLACK(b)) {
-        f(b->key, "black", b->count);
+        f(b->key);
     }
     rbt_preorder(b->left,f);
     rbt_preorder(b->right,f);
