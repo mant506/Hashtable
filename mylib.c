@@ -23,7 +23,7 @@ void *erealloc(void *p, size_t s) {
     return result;
 }
 void print_word(char *s) {
-    printf("%s\n", s);
+    printf("%s ", s);
 }
 int getword(char *s, int limit, FILE *stream) {
     int c;

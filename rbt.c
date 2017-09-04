@@ -108,13 +108,10 @@ rbt rbt_insert(rbt b, char *str) {
         b->count = 1;
         b->key = emalloc((strlen(str) + 1) * sizeof(b->key));
         strcpy(b->key, str);
-        printf("%s inserted\n", str);
         return b;
     } else if (strcmp(b->key,str) > 0) {
-        printf("Go left\n");
         b->left = rbt_insert(b->left,str);
     } else if (strcmp(b->key,str) < 0) {
-        printf("Go right\n");
         b->right = rbt_insert(b->right,str);
     } else if (strcmp(b->key,str) == 0) {
         b->count++;

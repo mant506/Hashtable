@@ -51,12 +51,17 @@ void htable_free(htable h) {
     free(h);
 }
 
-int htable_insert(htable h, char *str) {
+int htable_insert(htable h, char *str, char container_type) {
     
     unsigned int index = htable_word_to_int(str) % h->capacity;
     int step = htable_step(h, index);
     unsigned int i = index;
     if (h->containers[index] == NULL) {
+        if (container_type == 'r') {
+            h->containers[index] = container_new_rbt();
+        } else {
+            h->containers[index] = container_new_flexarray();
+        }
         container_add(h->containers[index], str); 
         h->frequencies[index] = 1;
         h->num_keys++;
@@ -70,7 +75,11 @@ int htable_insert(htable h, char *str) {
             index = (index + step) % h->capacity;
         } while (h->containers[index] != NULL && container_search(h->containers[index], str) != 1  && index != i);
         if (h->containers[index] == NULL) {
-            container_add(h->containers[index], str); 
+            if (container_type == 'r') {
+                h->containers[index] = container_new_rbt();
+            } else {
+                h->containers[index] = container_new_flexarray();
+            }
             h->frequencies[index] = 1;
             h->num_keys++;
         } else if (container_search(h->containers[index], str)) {
@@ -90,6 +99,7 @@ void htable_print(htable h, FILE *stream) {
         if (h->frequencies[i] != 0) {
             fprintf(stream, "%d ", h->frequencies[i]);
             container_print(h->containers[i], print_word);
+            printf("\n");
         }
     }
 }
