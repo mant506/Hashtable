@@ -25,20 +25,16 @@ static unsigned int htable_word_to_int(char *word) {
     return result;
 }
 
-htable htable_new(int capacity, char *container_type) {
+htable htable_new(int capacity) {
     int i;
     htable result = emalloc(sizeof *(result));
     result->capacity = capacity;
     result->num_keys = 0;
     result->frequencies = emalloc(capacity * sizeof result->frequencies[0]);
-    result->containers = emalloc(capacity * sizeof(struct containerrec *));
+    result->containers = emalloc(capacity * sizeof(*(result->containers)));
     for (i = 0; i < capacity; i++) {
         result->frequencies[i] = 0;
-        if (strcmp(container_type, "-r") == 0) {
-            result->containers[i] = container_new_rbt();
-        } else {
-            result->containers[i] = container_new_flexarray();
-        }
+        result->containers[i] = NULL;
     }
     return result;                       
 }
@@ -47,7 +43,9 @@ void htable_free(htable h) {
     unsigned int i;
     free(h->frequencies);
     for (i = 0; i < h->capacity; i++) {
-        container_free(h->containers[i]);
+        if (NULL != h->containers[i]) {
+            container_free(h->containers[i]);
+        }
     }
     free(h->containers);
     free(h);

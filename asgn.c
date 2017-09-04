@@ -6,7 +6,7 @@
 #include <string.h>
 
 int main (void) {
-    htable t = htable_new(10, "-r");
+    htable t = htable_new(10);
     htable_free(t);
     return EXIT_SUCCESS;
 }

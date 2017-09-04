@@ -29,15 +29,11 @@ container container_new_flexarray() {
     return result;
 }
 
-container container_free(container c) {
+void container_free(container c) {
     if (c->type == RED_BLACK_TREE) {
         rbt_free(c->contents);
-        free(c);
-        return c;
     } else {
         flexarray_free(c->contents);
-        free(c);
-        return c;
     }
 }
 
