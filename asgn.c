@@ -5,21 +5,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main (void) {
-    htable t = htable_new(10);
-    htable_insert(t, "hey", 'r');
-    htable_insert(t, "splendid", 'r');
-    htable_insert(t, "fab", 'r');
-    htable_insert(t, "wing", 'r');
-    htable_insert(t, "check", 'r');
-    /*
-    if (htable_search(t, "check") == 1) {
-        printf("check found\n");
-    } else {
-        printf("Not found\n");
+#define DEFAULT_SIZE 3877
+
+int main (int argc, char **argv) {
+    FILE *infile;
+    htable t = htable_new(DEFAULT_SIZE);
+    char word[256];
+    if (argc > 1) {
+        if (NULL == (infile = fopen(argv[1], "r"))) {
+            fprintf(stderr, "%s: can't find file %s\n", argv[0], argv[1]);
+            return EXIT_FAILURE;
+        }
+        while (getword(word, sizeof word, infile) != EOF) {
+            htable_insert(t, word, 'r');
+        }
+        while (getword(word, sizeof word, stdin) != EOF) {
+            if (htable_search(t, word) != 1) {
+                printf("%s not spelt correctly\n", word);
+            }
+        }
+        htable_free(t);
     }
-    */
-    htable_print(t, stdout);
-    htable_free(t);
     return EXIT_SUCCESS;
 }
