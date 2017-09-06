@@ -35,6 +35,7 @@ void container_free(container c) {
     } else {
         flexarray_free(c->contents);
     }
+    free(c);
 }
 
 int container_search(container c, char *target) {
