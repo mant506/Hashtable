@@ -85,7 +85,7 @@ int main (int argc, char **argv) {
             }
         }
     }
-
+    
     if (help == 1) {
         fprintf(stderr, "How to use the program...\n");
         return EXIT_SUCCESS;
@@ -173,7 +173,7 @@ int main (int argc, char **argv) {
         }
     }
     printf("Insert and Search Complete\n");
-    
+    htable_free(t);
     return EXIT_SUCCESS;
 }
 
