@@ -173,6 +173,7 @@ int main (int argc, char **argv) {
         }
     }
     printf("Insert and Search Complete\n");
+    fclose(infile);
     htable_free(t);
     return EXIT_SUCCESS;
 }
